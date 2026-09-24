@@ -29,7 +29,12 @@ MinIO Console 地址：http://localhost:9001
 - `GET /assets`、`POST /assets`、`PATCH /assets/:id`：素材列表、上传元数据、编辑信息。
 - `POST /assets/:id/publish`、`POST /assets/:id/archive`：素材发布与归档。
 - `GET /categories`、`POST /categories`：多级分类管理。
-- `GET /collections`、`POST /collections`、`PATCH /collections/:id/assets/:assetId`：收藏夹与协作素材集。
+- `GET /collections`、`POST /collections`、`GET /collections/:id`：收藏夹与协作素材集。列表只返回当前用户创建、参与协作或公开的收藏夹。
+- `PATCH /collections/:id`：编辑身份（或创建人）修改名称。
+- `PATCH /collections/:id/assets/:assetId`、`DELETE /collections/:id/assets/:assetId`：编辑身份（或创建人）增删素材。
+- `GET/POST /collections/:id/collaborators`、`DELETE /collections/:id/collaborators/:userId`：仅创建人查看、添加（指定 `Viewer`/`Editor` 身份）和移除协作成员；移除后对方后续请求立即被拒绝。
+- 公开收藏夹（`isPublic: true`）所有登录成员可读，但非协作者仍不能修改。
+- 所有修改类请求需在请求体携带最后看到的 `revision`；若期间已被他人改动，返回 `409 COLLECTION_REVISION_CONFLICT` 与 `latestRevision`、当前名称和素材清单，本次提交不覆盖对方改动。
 - `POST /assets/:assetId/downloads`、`GET /downloads`：下载记录和许可校验。
 - `GET /tags`、`POST /tags`：标签管理。
 - `POST /reviews/assets/:assetId`、`GET /reviews`：素材审核记录。
@@ -51,7 +56,7 @@ backend/src/
 
 ## 枚举位置
 
-共享枚举统一位于 `backend/src/types/enums.ts`，包含 `AssetType`、`LicenseType`、`AssetStatus`、`ReviewResult`、`DownloadPurpose`、`TagCategory` 和 `UserRole`。
+共享枚举统一位于 `backend/src/types/enums.ts`，包含 `AssetType`、`LicenseType`、`AssetStatus`、`ReviewResult`、`DownloadPurpose`、`TagCategory`、`UserRole` 和收藏夹协作身份 `CollaboratorRole`（`Viewer` / `Editor`）。
 
 ## License
 

@@ -1,7 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { CollaboratorRole } from '../types/enums';
 
 export type CollectionDocument = HydratedDocument<Collection>;
+
+@Schema({ _id: false })
+export class CollectionCollaborator {
+  @Prop({ required: true })
+  userId!: string;
+
+  @Prop({ required: true, enum: Object.values(CollaboratorRole) })
+  role!: CollaboratorRole;
+}
 
 @Schema({ timestamps: true })
 export class Collection {
@@ -23,8 +33,14 @@ export class Collection {
   @Prop({ default: false })
   isPublic!: boolean;
 
-  @Prop({ type: [String], default: [] })
-  collaboratorIds!: string[];
+  @Prop({
+    type: [CollectionCollaborator],
+    default: [],
+  })
+  collaborators!: CollectionCollaborator[];
+
+  @Prop({ default: 0, min: 0 })
+  revision!: number;
 }
 
 export const CollectionSchema = SchemaFactory.createForClass(Collection);

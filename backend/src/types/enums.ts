@@ -51,3 +51,8 @@ export enum UserRole {
   Uploader = 'Uploader',
   Viewer = 'Viewer',
 }
+
+export enum CollaboratorRole {
+  Viewer = 'Viewer',
+  Editor = 'Editor',
+}
