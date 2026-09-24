@@ -27,6 +27,7 @@ import { RateLimitMiddleware } from './middlewares/rateLimit.middleware';
 import { RbacMiddleware } from './middlewares/rbac.middleware';
 import { RequestLoggerMiddleware } from './middlewares/requestLogger.middleware';
 import { ValidationMiddleware } from './middlewares/validation.middleware';
+import { CollectionAccessGuard } from './guards/collectionAccess.guard';
 
 @Module({
   imports: [
@@ -41,7 +42,7 @@ import { ValidationMiddleware } from './middlewares/validation.middleware';
     ]),
   ],
   controllers: [HealthController, AssetController, CategoryController, CollectionController, DownloadController, ReviewController, TagController],
-  providers: [AssetService, CategoryService, CollectionService, DownloadService, ReviewService, StorageService, TagService],
+  providers: [AssetService, CategoryService, CollectionService, DownloadService, ReviewService, StorageService, TagService, CollectionAccessGuard],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

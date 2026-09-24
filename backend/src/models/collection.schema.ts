@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { CollectionCollaborator, CollectionCollaboratorSchema } from './collectionCollaborator.schema';
 
 export type CollectionDocument = HydratedDocument<Collection>;
 
@@ -23,8 +24,12 @@ export class Collection {
   @Prop({ default: false })
   isPublic!: boolean;
 
-  @Prop({ type: [String], default: [] })
-  collaboratorIds!: string[];
+  @Prop({ type: [CollectionCollaboratorSchema], default: [] })
+  collaborators!: CollectionCollaborator[];
+
+  @Prop({ required: true, default: 1 })
+  revision!: number;
 }
 
 export const CollectionSchema = SchemaFactory.createForClass(Collection);
+CollectionSchema.index({ 'collaborators.userId': 1 });

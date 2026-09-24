@@ -7,8 +7,10 @@ export class ErrorHandlerMiddleware implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    const message = exception instanceof Error ? exception.message : 'Unexpected error';
+    const body = exception instanceof HttpException ? exception.getResponse() : undefined;
+    const extra = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
+    const message = typeof body === 'string' ? body : exception instanceof Error ? exception.message : 'Unexpected error';
     logger.error(message, exception);
-    response.status(status).json({ success: false, message, statusCode: status });
+    response.status(status).json({ success: false, ...extra, message, statusCode: status });
   }
 }

@@ -29,7 +29,10 @@ MinIO Console 地址：http://localhost:9001
 - `GET /assets`、`POST /assets`、`PATCH /assets/:id`：素材列表、上传元数据、编辑信息。
 - `POST /assets/:id/publish`、`POST /assets/:id/archive`：素材发布与归档。
 - `GET /categories`、`POST /categories`：多级分类管理。
-- `GET /collections`、`POST /collections`、`PATCH /collections/:id/assets/:assetId`：收藏夹与协作素材集。
+- `GET /collections`、`POST /collections`：收藏夹列表（按可见性过滤）与创建。
+- `GET /collections/:id`、`PATCH /collections/:id`：收藏夹详情与改名（携带 `expectedRevision` 乐观锁，冲突返回 409 与最新修订号）。
+- `PATCH /collections/:id/assets/:assetId`、`DELETE /collections/:id/assets/:assetId`：协作素材增删（需 Editor 身份与 `expectedRevision`）。
+- `POST /collections/:id/collaborators`、`DELETE /collections/:id/collaborators/:userId`：协作成员管理（仅创建者，成员分 Viewer/Editor 身份）。
 - `POST /assets/:assetId/downloads`、`GET /downloads`：下载记录和许可校验。
 - `GET /tags`、`POST /tags`：标签管理。
 - `POST /reviews/assets/:assetId`、`GET /reviews`：素材审核记录。
@@ -41,8 +44,10 @@ backend/src/
 ├── routes/           # asset.routes.ts, category.routes.ts, collection.routes.ts, download.routes.ts, tag.routes.ts
 ├── controllers/      # asset.controller.ts, category.controller.ts, collection.controller.ts, download.controller.ts, tag.controller.ts
 ├── services/         # asset.service.ts, category.service.ts, collection.service.ts, download.service.ts, tag.service.ts, review.service.ts, storage.service.ts
-├── models/           # asset.schema.ts, category.schema.ts, collection.schema.ts, downloadRecord.schema.ts, tag.schema.ts, reviewRecord.schema.ts
+├── models/           # asset.schema.ts, category.schema.ts, collection.schema.ts, collectionCollaborator.schema.ts, downloadRecord.schema.ts, tag.schema.ts, reviewRecord.schema.ts
 ├── middlewares/      # auth.middleware.ts, rbac.middleware.ts, auditLog.middleware.ts, errorHandler.middleware.ts, rateLimit.middleware.ts, requestLogger.middleware.ts, validation.middleware.ts
+├── guards/           # collectionAccess.guard.ts（收藏夹实时鉴权）
+├── decorators/       # collectionAction.decorator.ts（收藏夹动作元数据）
 ├── types/            # enums.ts, interfaces.ts
 ├── utils/            # logger.ts, response.ts, fileValidator.ts, thumbnailGenerator.ts
 ├── config/           # database.config.ts, jwt.config.ts, redis.config.ts, minio.config.ts, swagger.config.ts
